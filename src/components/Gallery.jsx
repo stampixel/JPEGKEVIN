@@ -222,14 +222,8 @@ const Gallery = () => {
                 className="relative cursor-pointer transition-transform duration-400 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:-translate-y-1 group"
                 onClick={() => openLightbox(photo)}
               >
-                {/* Film frame border */}
+                {/* Photo frame border */}
                 <div className="absolute -inset-1.5 md:-inset-3 bg-bg-secondary border border-border-light -z-10 transition-all duration-300 group-hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] group-hover:border-text-secondary" />
-                
-                {/* Film sprocket holes - hidden on mobile */}
-                <div className="hidden lg:block absolute top-0 bottom-0 -left-5 w-1.5 opacity-0 transition-opacity duration-300 group-hover:opacity-100
-                  bg-[repeating-linear-gradient(to_bottom,var(--color-bg-primary)_0px,var(--color-bg-primary)_4px,var(--color-border-light)_4px,var(--color-border-light)_8px)]" 
-                  style={{ top: '-12px', bottom: '-12px' }}
-                />
                 
                 <PersistentImage 
                   src={photo.src} 
