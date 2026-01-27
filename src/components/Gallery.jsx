@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 const imagesGlob = import.meta.glob('/src/assets/portfolio/*.{jpg,jpeg,png,webp,svg,JPG,JPEG,PNG,WEBP,SVG}', { eager: true });
 
-// lazy load images but no unload
+// Lazy load images but never unload
 const PersistentImage = ({ src, alt, className }) => {
   const [shouldLoad, setShouldLoad] = useState(false);
   const imgRef = useRef(null);
@@ -53,88 +53,172 @@ const shuffleArray = (array, seed) => {
   return shuffled;
 };
 
+// Hook to detect image orientation
+const useImageOrientations = (photos) => {
+  const [orientations, setOrientations] = useState({});
+
+  useEffect(() => {
+    const loadOrientations = async () => {
+      const results = {};
+      await Promise.all(
+        photos.map((photo) => {
+          return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              results[photo.name] = img.width > img.height ? 'horizontal' : 'vertical';
+              resolve();
+            };
+            img.onerror = () => {
+              results[photo.name] = 'horizontal';
+              resolve();
+            };
+            img.src = photo.src;
+          });
+        })
+      );
+      setOrientations(results);
+    };
+
+    if (photos.length > 0) {
+      loadOrientations();
+    }
+  }, [photos]);
+
+  return orientations;
+};
+
 const Gallery = () => {
   const photos = useMemo(() => {
     return Object.entries(imagesGlob).map(([path, module]) => {
       const name = path.split('/').pop();
-      const ext = name.split('.').pop().toLowerCase();
-      return { name, src: module.default, ext };
+      return { name, src: module.default };
     });
   }, []);
 
-  const [sortBy, setSortBy] = useState('name-asc');
+  const orientations = useImageOrientations(photos);
   const [shuffleSeed, setShuffleSeed] = useState(Date.now());
-  const [columns, setColumns] = useState(3);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Detect mobile/desktop
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 1024) setColumns(2);
-      else setColumns(3);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
     };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  const handleSortChange = (newSort) => {
-    setSortBy(newSort);
-    // Generate new seed when switching to random
-    if (newSort === 'random') {
-      setShuffleSeed(Date.now());
-    }
-  };
 
   const reshuffle = () => {
     setShuffleSeed(Date.now());
   };
 
-  const sortedPhotos = useMemo(() => {
-    const sorted = [...photos];
-    switch (sortBy) {
-      case 'name-asc':
-        sorted.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
-        break;
-      case 'name-desc':
-        sorted.sort((a, b) => b.name.localeCompare(a.name, undefined, { numeric: true }));
-        break;
-      case 'ext-asc':
-        sorted.sort((a, b) => a.ext.localeCompare(b.ext) || a.name.localeCompare(b.name, undefined, { numeric: true }));
-        break;
-      case 'random':
-        return shuffleArray(sorted, shuffleSeed);
-      default:
-        break;
-    }
-    return sorted;
-  }, [photos, sortBy, shuffleSeed]);
+  // Row sizes: Mobile = 1 horizontal, 2 vertical | Desktop = 2 horizontal, 3 vertical
+  const horizontalPerRow = isMobile ? 1 : 2;
+  const verticalPerRow = isMobile ? 2 : 3;
 
-  const columnWrapper = useMemo(() => {
-    const cols = Array.from({ length: columns }, () => []);
-    sortedPhotos.forEach((photo, i) => {
-      cols[i % columns].push({ ...photo, globalIndex: i });
+  // Create randomly ordered rows alternating between horizontal and vertical
+  const photoRows = useMemo(() => {
+    if (Object.keys(orientations).length === 0) return [];
+
+    // Separate and shuffle photos by orientation
+    const horizontal = shuffleArray(
+      photos.filter(p => orientations[p.name] === 'horizontal'),
+      shuffleSeed
+    );
+    const vertical = shuffleArray(
+      photos.filter(p => orientations[p.name] === 'vertical'),
+      shuffleSeed + 1000
+    );
+
+    const rows = [];
+    let hIdx = 0;
+    let vIdx = 0;
+    let rowSeed = shuffleSeed;
+
+    // Randomly alternate between horizontal and vertical rows
+    while (hIdx < horizontal.length || vIdx < vertical.length) {
+      const canDoHorizontal = horizontal.length - hIdx >= horizontalPerRow;
+      const canDoVertical = vertical.length - vIdx >= verticalPerRow;
+      
+      // Randomly choose row type if both are possible
+      let doHorizontal;
+      if (canDoHorizontal && canDoVertical) {
+        doHorizontal = seededRandom(rowSeed++) > 0.5;
+      } else if (canDoHorizontal) {
+        doHorizontal = true;
+      } else if (canDoVertical) {
+        doHorizontal = false;
+      } else {
+        // Handle remaining photos
+        if (hIdx < horizontal.length) {
+          rows.push({
+            type: 'horizontal',
+            photos: horizontal.slice(hIdx),
+          });
+          hIdx = horizontal.length;
+        }
+        if (vIdx < vertical.length) {
+          rows.push({
+            type: 'vertical',
+            photos: vertical.slice(vIdx),
+          });
+          vIdx = vertical.length;
+        }
+        break;
+      }
+
+      if (doHorizontal) {
+        rows.push({
+          type: 'horizontal',
+          photos: horizontal.slice(hIdx, hIdx + horizontalPerRow),
+        });
+        hIdx += horizontalPerRow;
+      } else {
+        rows.push({
+          type: 'vertical',
+          photos: vertical.slice(vIdx, vIdx + verticalPerRow),
+        });
+        vIdx += verticalPerRow;
+      }
+    }
+
+    // Add global index for display
+    let globalIdx = 0;
+    rows.forEach(row => {
+      row.photos = row.photos.map(photo => ({
+        ...photo,
+        globalIndex: globalIdx++,
+      }));
     });
-    return cols;
-  }, [sortedPhotos, columns]);
+
+    return rows;
+  }, [photos, orientations, shuffleSeed, horizontalPerRow, verticalPerRow]);
+
+  // Flat list for lightbox navigation
+  const allPhotos = useMemo(() => {
+    return photoRows.flatMap(row => row.photos);
+  }, [photoRows]);
 
   const openLightbox = (photo) => setSelectedPhoto(photo);
   const closeLightbox = () => setSelectedPhoto(null);
 
   const currentIndex = selectedPhoto 
-    ? sortedPhotos.findIndex(p => p.name === selectedPhoto.name)
+    ? allPhotos.findIndex(p => p.name === selectedPhoto.name)
     : -1;
 
   const nextPhoto = (e) => {
     e.stopPropagation();
-    if (currentIndex !== -1 && currentIndex < sortedPhotos.length - 1) {
-      setSelectedPhoto(sortedPhotos[currentIndex + 1]);
+    if (currentIndex !== -1 && currentIndex < allPhotos.length - 1) {
+      setSelectedPhoto(allPhotos[currentIndex + 1]);
     }
   };
 
   const prevPhoto = (e) => {
     e.stopPropagation();
     if (currentIndex !== -1 && currentIndex > 0) {
-      setSelectedPhoto(sortedPhotos[currentIndex - 1]);
+      setSelectedPhoto(allPhotos[currentIndex - 1]);
     }
   };
 
@@ -143,17 +227,17 @@ const Gallery = () => {
       if (!selectedPhoto) return;
       if (e.key === 'Escape') closeLightbox();
       if (e.key === 'ArrowRight') {
-        const idx = sortedPhotos.findIndex(p => p.name === selectedPhoto.name);
-        if (idx !== -1 && idx < sortedPhotos.length - 1) setSelectedPhoto(sortedPhotos[idx + 1]);
+        const idx = allPhotos.findIndex(p => p.name === selectedPhoto.name);
+        if (idx !== -1 && idx < allPhotos.length - 1) setSelectedPhoto(allPhotos[idx + 1]);
       }
       if (e.key === 'ArrowLeft') {
-        const idx = sortedPhotos.findIndex(p => p.name === selectedPhoto.name);
-        if (idx !== -1 && idx > 0) setSelectedPhoto(sortedPhotos[idx - 1]);
+        const idx = allPhotos.findIndex(p => p.name === selectedPhoto.name);
+        if (idx !== -1 && idx > 0) setSelectedPhoto(allPhotos[idx - 1]);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedPhoto, sortedPhotos]);
+  }, [selectedPhoto, allPhotos]);
 
   useEffect(() => {
     if (selectedPhoto) {
@@ -171,55 +255,42 @@ const Gallery = () => {
   return (
     <>
       {/* Toolbar */}
-      <div className="mx-2 mb-4 p-2 md:mx-4 md:p-4 lg:mx-12 lg:mb-6 bg-bg-secondary border border-border-light flex flex-col md:flex-row md:justify-between md:items-center gap-4 relative
+      <div className="mx-2 mb-4 p-2 md:mx-4 md:p-4 lg:mx-12 lg:mb-6 bg-bg-secondary border border-border-light flex flex-row justify-between items-center gap-4 relative
         before:content-['+'] before:absolute before:-top-[3px] before:-left-[3px] before:text-[0.7rem] before:text-text-muted before:font-mono
         after:content-['+'] after:absolute after:-bottom-[3px] after:-right-[3px] after:text-[0.7rem] after:text-text-muted after:font-mono">
-        <div className="flex items-center gap-2 md:gap-4 flex-wrap">
-          <span className="text-[0.7rem] uppercase tracking-[0.15em] text-text-secondary">Sort by</span>
-          <select 
-            value={sortBy} 
-            onChange={(e) => handleSortChange(e.target.value)}
-            className="border py-2 px-3 pr-9 font-mono text-xs cursor-pointer outline-none transition-all duration-200 appearance-none w-full md:w-auto md:min-w-[180px] bg-no-repeat"
-            style={{
-              backgroundColor: 'var(--color-bg-primary)',
-              borderColor: 'var(--color-border-light)',
-              color: 'var(--color-text-primary)',
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235a5a55' d='M6 8L2 4h8z'/%3E%3C/svg%3E")`,
-              backgroundPosition: 'right 12px center'
-            }}
-          >
-            <option value="name-asc">Name (A-Z)</option>
-            <option value="name-desc">Name (Z-A)</option>
-            <option value="ext-asc">File Type</option>
-            <option value="random">Random</option>
-          </select>
-          {sortBy === 'random' && (
-            <button
-              onClick={reshuffle}
-              className="border py-2 px-3 font-mono text-xs cursor-pointer transition-all duration-200 hover:border-text-secondary"
-              style={{
-                backgroundColor: 'var(--color-bg-primary)',
-                borderColor: 'var(--color-border-light)',
-                color: 'var(--color-text-primary)',
-              }}
-            >
-              ↻ Shuffle
-            </button>
-          )}
-        </div>
+        <button
+          onClick={reshuffle}
+          className="border py-2 px-3 font-mono text-xs cursor-pointer transition-all duration-200 hover:border-text-secondary"
+          style={{
+            backgroundColor: 'var(--color-bg-primary)',
+            borderColor: 'var(--color-border-light)',
+            color: 'var(--color-text-primary)',
+          }}
+        >
+          ↻ Shuffle
+        </button>
         <div className="text-[0.7rem] text-text-muted uppercase tracking-[0.1em]">
           {photos.length} exposures
         </div>
       </div>
 
       {/* Gallery Grid */}
-      <div className="flex gap-2 px-2 md:gap-4 md:px-4 lg:gap-6 lg:px-12 items-start">
-        {columnWrapper.map((colImages, colIndex) => (
-          <div key={colIndex} className="flex-1 flex flex-col gap-2 md:gap-4 lg:gap-6 min-w-0">
-            {colImages.map((photo) => (
+      <div className="flex flex-col gap-3 px-2 md:gap-5 md:px-4 lg:gap-6 lg:px-12">
+        {photoRows.map((row, rowIndex) => (
+          <div 
+            key={rowIndex} 
+            className={`flex gap-3 md:gap-5 lg:gap-6 ${
+              row.type === 'horizontal' ? 'justify-center' : ''
+            }`}
+          >
+            {row.photos.map((photo) => (
               <div 
                 key={photo.name} 
-                className="relative cursor-pointer transition-transform duration-400 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:-translate-y-1 group"
+                className={`relative cursor-pointer transition-transform duration-400 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:-translate-y-1 group ${
+                  row.type === 'horizontal' 
+                    ? 'w-full md:w-1/2'
+                    : 'w-1/2 md:w-1/3'
+                }`}
                 onClick={() => openLightbox(photo)}
               >
                 {/* Photo frame border */}
@@ -258,7 +329,7 @@ const Gallery = () => {
           >
             {/* Counter */}
             <span className="absolute -top-12 left-0 text-xs text-white/50 tracking-[0.1em]">
-              {formatFrameNumber(currentIndex)} / {formatFrameNumber(sortedPhotos.length - 1)}
+              {formatFrameNumber(currentIndex)} / {formatFrameNumber(allPhotos.length - 1)}
             </span>
             
             {/* Close button */}
@@ -302,7 +373,7 @@ const Gallery = () => {
                 ←
               </button>
             )}
-            {currentIndex < sortedPhotos.length - 1 && (
+            {currentIndex < allPhotos.length - 1 && (
               <button 
                 className="fixed right-5 top-1/2 -translate-y-1/2 bg-white/5 text-white/70 border border-white/10 w-15 h-20 text-2xl cursor-pointer transition-all duration-200 flex items-center justify-center font-mono hover:bg-white/10 hover:border-white/30 hover:text-white
                   md:w-15 md:h-20 max-md:bottom-8 max-md:top-auto max-md:translate-y-0 max-md:w-12 max-md:h-12 max-md:rounded-full"
