@@ -1,6 +1,20 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 
-const imagesGlob = import.meta.glob('/src/assets/portfolio/*.{jpg,jpeg,png,webp,svg,JPG,JPEG,PNG,WEBP,SVG}', { eager: true });
+// Import all images from both folders eagerly
+const portfolioImages = import.meta.glob('/src/assets/portfolio/*.{jpg,jpeg,png,webp,svg,JPG,JPEG,PNG,WEBP,SVG}', { eager: true });
+const michiganDailyImages = import.meta.glob('/src/assets/michigan-daily/*.{jpg,jpeg,png,webp,svg,JPG,JPEG,PNG,WEBP,SVG}', { eager: true });
+
+// Import metadata for michigan-daily
+import michiganDailyMetadata from '../assets/michigan-daily/metadata.json';
+
+const imageSets = {
+  portfolio: portfolioImages,
+  'michigan-daily': michiganDailyImages,
+};
+
+const metadataSets = {
+  'michigan-daily': michiganDailyMetadata.photos || {},
+};
 
 // Lazy load images but never unload
 const PersistentImage = ({ src, alt, className }) => {
@@ -87,13 +101,22 @@ const useImageOrientations = (photos) => {
   return orientations;
 };
 
-const Gallery = () => {
+const Gallery = ({ folder = 'portfolio' }) => {
+  const metadata = metadataSets[folder] || {};
+  
   const photos = useMemo(() => {
+    const imagesGlob = imageSets[folder] || portfolioImages;
     return Object.entries(imagesGlob).map(([path, module]) => {
       const name = path.split('/').pop();
-      return { name, src: module.default };
+      const photoMeta = metadata[name] || {};
+      return { 
+        name, 
+        src: module.default,
+        description: photoMeta.description || '',
+        date: photoMeta.date || '',
+      };
     });
-  }, []);
+  }, [folder, metadata]);
 
   const orientations = useImageOrientations(photos);
   const [shuffleSeed, setShuffleSeed] = useState(Date.now());
@@ -309,7 +332,11 @@ const Gallery = () => {
                 
                 {/* Hover info overlay */}
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent pt-12 pb-4 px-4 opacity-0 transition-opacity duration-300 z-30 group-hover:opacity-100">
-                  <span className="text-white/90 text-[0.65rem] uppercase tracking-[0.1em]">{photo.name}</span>
+                  {photo.description ? (
+                    <span className="text-white/90 text-[0.7rem] leading-relaxed">{photo.description}</span>
+                  ) : (
+                    <span className="text-white/90 text-[0.65rem] uppercase tracking-[0.1em]">{photo.name}</span>
+                  )}
                 </div>
               </div>
             ))}
@@ -357,10 +384,25 @@ const Gallery = () => {
             
             {/* Metadata bar */}
             <div className="flex justify-between items-center p-4 bg-white/[0.03] border-t border-white/10 mt-5">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[0.7rem] text-white/50 uppercase tracking-[0.1em]">Filename</span>
-                <span className="text-white/90 text-xs">{selectedPhoto.name}</span>
+              <div className="flex flex-col gap-0.5 flex-1">
+                {selectedPhoto.description ? (
+                  <>
+                    <span className="text-[0.7rem] text-white/50 uppercase tracking-[0.1em]">Description</span>
+                    <span className="text-white/90 text-sm leading-relaxed">{selectedPhoto.description}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-[0.7rem] text-white/50 uppercase tracking-[0.1em]">Filename</span>
+                    <span className="text-white/90 text-xs">{selectedPhoto.name}</span>
+                  </>
+                )}
               </div>
+              {selectedPhoto.date && (
+                <div className="flex flex-col gap-0.5 text-right ml-6">
+                  <span className="text-[0.7rem] text-white/50 uppercase tracking-[0.1em]">Date</span>
+                  <span className="text-white/90 text-xs">{selectedPhoto.date}</span>
+                </div>
+              )}
             </div>
             
             {/* Nav Arrows */}
