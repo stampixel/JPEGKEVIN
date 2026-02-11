@@ -6,12 +6,6 @@ function App() {
   const currentYear = new Date().getFullYear();
   const location = useLocation();
   
-  // Determine page title and subtitle based on route
-  const isMichiganDaily = location.pathname === '/michigan-daily';
-  const pageTitle = isMichiganDaily ? 'Michigan Daily' : 'Kevin Tang';
-  const pageSubtitle = isMichiganDaily ? 'Photo Journalism' : 'Selected Works';
-  const frameNumber = isMichiganDaily ? '№ 002' : '№ 001';
-  
   return (
     <div className="max-w-7xl mx-auto pb-20 relative">
       {/* Side film strip decorations */}
@@ -22,11 +16,11 @@ function App() {
         <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 md:gap-6">
           <div className="relative">
             {/* Decorative frame number */}
-            <span className="absolute -top-5 left-0 font-mono text-[0.65rem] text-text-muted tracking-[0.15em]">{frameNumber}</span>
+            <span className="absolute -top-5 left-0 font-mono text-[0.65rem] text-text-muted tracking-[0.15em]">№ 001</span>
             <Link to="/" className="hover:opacity-80 transition-opacity">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-none text-text-primary">{pageTitle}</h1>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-none text-text-primary">Kevin Tang</h1>
             </Link>
-            <p className="font-mono text-xs text-text-secondary uppercase tracking-[0.2em] mt-2">{pageSubtitle}</p>
+            <p className="font-mono text-xs text-text-secondary uppercase tracking-[0.2em] mt-2">Selected Works</p>
           </div>
           <div className="text-left md:text-right text-[0.7rem] text-text-muted leading-relaxed">
             <span className="block">35mm / Digital</span>
@@ -46,16 +40,6 @@ function App() {
           >
             Portfolio
           </Link>
-          <Link 
-            to="/michigan-daily" 
-            className={`transition-colors duration-200 ${
-              location.pathname === '/michigan-daily' 
-                ? 'text-text-primary border-b border-text-primary pb-1' 
-                : 'text-text-muted hover:text-text-secondary'
-            }`}
-          >
-            Michigan Daily
-          </Link>
         </nav>
         
         {/* Divider line */}
@@ -65,7 +49,6 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Gallery folder="portfolio" />} />
-          <Route path="/michigan-daily" element={<Gallery folder="michigan-daily" />} />
         </Routes>
       </main>
     </div>

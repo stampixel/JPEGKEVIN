@@ -1,20 +1,13 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 
-// Import all images from both folders eagerly
+// Import all images from portfolio folder eagerly
 const portfolioImages = import.meta.glob('/src/assets/portfolio/*.{jpg,jpeg,png,webp,svg,JPG,JPEG,PNG,WEBP,SVG}', { eager: true });
-const michiganDailyImages = import.meta.glob('/src/assets/michigan-daily/*.{jpg,jpeg,png,webp,svg,JPG,JPEG,PNG,WEBP,SVG}', { eager: true });
-
-// Import metadata for michigan-daily
-import michiganDailyMetadata from '../assets/michigan-daily/metadata.json';
 
 const imageSets = {
   portfolio: portfolioImages,
-  'michigan-daily': michiganDailyImages,
 };
 
-const metadataSets = {
-  'michigan-daily': michiganDailyMetadata.photos || {},
-};
+const metadataSets = {};
 
 // Lazy load images but never unload
 const PersistentImage = ({ src, alt, className }) => {
