@@ -161,7 +161,7 @@ a:focus-visible { outline: 2px dotted #FF0000; outline-offset: 1px; }
 .potm img { border: 4px ridge #C0A060; max-width: 100%; height: auto; }
 .potm .cap { font-family: "Comic Sans MS", cursive; font-size: 13px; margin-top: 8px; }
 
-.album { width: 100%; border-collapse: collapse; background: #FFFFFF; border: 2px inset #808080; }
+.album { width: 100%; table-layout: fixed; border-collapse: collapse; background: #FFFFFF; border: 2px inset #808080; }
 .album td {
   border: 2px outset #C0C0C0;
   padding: 8px 6px;
@@ -174,6 +174,14 @@ a:focus-visible { outline: 2px dotted #FF0000; outline-offset: 1px; }
 .album .cap { font-family: "Comic Sans MS", cursive; font-size: 11.5px; line-height: 1.35; margin-top: 6px; display: block; }
 .album .kb { font-family: "Courier New", monospace; font-size: 10px; color: #666666; display: block; margin-top: 2px; }
 .album-scroll { overflow-x: auto; }
+
+/* Narrow screens: reflow the album to two columns instead of side-scrolling */
+@media (max-width: 520px) {
+  .album { display: block; }
+  .album tbody { display: flex; flex-wrap: wrap; }
+  .album tr { display: contents; }
+  .album td { display: block; width: 50%; }
+}
 
 .updates { font-family: "Courier New", Courier, monospace; font-size: 13px; line-height: 1.7; }
 
