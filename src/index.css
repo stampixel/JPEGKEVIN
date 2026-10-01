@@ -36,6 +36,7 @@ a:link    { color: #0000EE; }
 a:visited { color: #551A8B; }
 a:active  { color: #FF0000; }
 a:focus-visible, button:focus-visible { outline: 2px dotted #FF0000; outline-offset: 1px; }
+::selection { background: #000080; color: #FFFF00; }
 
 .rainbow-rule {
   height: 5px;
