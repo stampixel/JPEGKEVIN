@@ -24,6 +24,12 @@ export default function PhotoViewer({ photos, index, onChange, onClose }) {
   });
 
   useEffect(() => {
+    const original = document.title;
+    document.title = 'Photo ' + (index + 1) + ' of ' + count + ' - ' + original;
+    return () => { document.title = original; };
+  }, [index, count]);
+
+  useEffect(() => {
     [index + 1, index - 1].forEach((i) => {
       new Image().src = photos[(i + count) % count].src;
     });

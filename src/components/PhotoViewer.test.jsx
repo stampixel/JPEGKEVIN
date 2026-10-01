@@ -62,4 +62,12 @@ describe('PhotoViewer', () => {
     render(<PhotoViewer photos={photos} index={0} onChange={noop} onClose={noop} />);
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Close' }));
   });
+
+  it('puts the photo position in the tab title while open and restores it after', () => {
+    document.title = 'Kevin Tang';
+    const { unmount } = render(<PhotoViewer photos={photos} index={1} onChange={noop} onClose={noop} />);
+    expect(document.title).toBe('Photo 2 of 3 - Kevin Tang');
+    unmount();
+    expect(document.title).toBe('Kevin Tang');
+  });
 });
