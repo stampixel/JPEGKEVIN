@@ -65,8 +65,8 @@ function App() {
             photography, cycling, and writing. I occasionally smoke too, it’s fun. I don’t have a lot of
             achievements, however some of the things I’m proud of are: 5-figure dropshipping business in
             high school, solo traveling to climb buildings, knowing how to lockpick really well, and being
-            able to provide for my family. I am also proud of myself as a person. I hope I can find a loving
-            wife and make an impact on this world.
+            able to provide for my family. I am also proud of myself as a person. I hope I can make an impact
+            on this world.
           </p>
         </div>
 
