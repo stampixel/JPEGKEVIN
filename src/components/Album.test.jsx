@@ -16,11 +16,13 @@ describe('Album', () => {
     expect(hrefs).toEqual(['/l1.jpg', '/l2.jpg', '/p1.jpg', '/p2.jpg', '/p3.jpg']);
   });
 
-  it('lays photos out in rows by orientation and reflows for narrow screens', () => {
+  it('lays photos out in rows that keep their order, and reflows for narrow screens', () => {
     const { container, rerender } = render(<Album photos={photos} onOpen={noop} />);
     expect(container.querySelectorAll('.row').length).toBe(2);
     rerender(<Album photos={photos} narrow onOpen={noop} />);
     expect(container.querySelectorAll('.row').length).toBe(4);
+    const order = [...container.querySelectorAll('.cell')].map((a) => a.getAttribute('href'));
+    expect(order).toEqual(['/l1.jpg', '/l2.jpg', '/p1.jpg', '/p2.jpg', '/p3.jpg']);
   });
 
   it('opens the clicked photo instead of following the link', () => {
