@@ -31,6 +31,11 @@ describe('groupRows on wide screens', () => {
     expect(names(rows)).toEqual([['p1'], ['l1']]);
   });
 
+  it('places a row that filled late near where it started, not at the end', () => {
+    const rows = groupRows([L('l1'), P('p1'), L('l2'), L('l3'), L('l4'), P('p2'), P('p3')]);
+    expect(names(rows)).toEqual([['l1', 'l2'], ['p1', 'p2', 'p3'], ['l3', 'l4']]);
+  });
+
   it('returns no rows for no photos', () => {
     expect(groupRows([])).toEqual([]);
   });
