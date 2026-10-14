@@ -5,9 +5,6 @@ import { HEIGHTS } from './heights.js';
 // Every image in src/assets/portfolio is on the site: drop a file in and it shows up.
 // The list below only decides order; photos not named here follow it, sorted by file name.
 
-// Shown big at the top of the page and first in the viewer.
-export const FEATURED = 'DSC04050.jpg';
-
 // Album order. Landscapes pair up two to a row and portraits three to a row,
 // in this sequence, so neighbours here end up side by side on the page.
 const S = 'SONY ILCE-6100 6048x4024_';
@@ -55,5 +52,4 @@ export const all = manifest.map((photo) => ({
   altitude: HEIGHTS[photo.name] ?? null,
 }));
 
-export const featured = all.find((photo) => photo.name === FEATURED) ?? all[0];
-export const album = orderByPreference(all.filter((photo) => photo !== featured), ORDER);
+export const album = orderByPreference(all, ORDER);

@@ -5,15 +5,14 @@ import Gauge from './components/Gauge.jsx';
 import PhotoViewer from './components/PhotoViewer.jsx';
 import PostcardDialog from './components/PostcardDialog.jsx';
 import Sky from './components/Sky.jsx';
-import { featured, album, all } from './photos.js';
+import { album, all } from './photos.js';
 import { newest } from './lib/fresh.js';
 import { orderByHeight, describeHeight, nearestRow } from './lib/heights.js';
 
 // Once heights are filled in, the album becomes a building: highest photo first.
 const heightsKnown = all.some((p) => p.altitude != null);
 const albumPhotos = heightsKnown ? orderByHeight(album) : album;
-// Everything the viewer can step through: the Photo of the Month first, then the album.
-const viewerPhotos = [featured, ...albumPhotos];
+const viewerPhotos = albumPhotos;
 const freshPrints = newest(all, 6);
 
 // "#12" in the address bar opens photo 12.
@@ -38,15 +37,15 @@ function useMediaQuery(query) {
 
 // The height of whatever row of photos is in the middle of the screen right now.
 function useHeightInView(enabled) {
-  const [height, setHeight] = useState(featured.altitude);
+  const [height, setHeight] = useState(albumPhotos[0]?.altitude ?? null);
   useEffect(() => {
     if (!enabled) return undefined;
     const update = () => {
       const line = window.innerHeight * 0.45;
       if (document.querySelector('.footer')?.getBoundingClientRect().top < window.innerHeight) { setHeight(0); return; }
-      const rows = [...document.querySelectorAll('.potm, .album .row')].map((el) => {
+      const rows = [...document.querySelectorAll('.album .row')].map((el) => {
         const r = el.getBoundingClientRect();
-        const raw = el.classList.contains('potm') ? featured.altitude : el.dataset.height;
+        const raw = el.dataset.height;
         return { top: r.top, bottom: r.bottom, value: raw === '' || raw == null ? null : Number(raw) };
       });
       setHeight(nearestRow(rows, line) ?? null);
@@ -114,25 +113,12 @@ function App() {
 
         <div className="rainbow-rule" />
 
-        <div className="section-bar" id="potm">&#9733; Photo of the Month</div>
-        <div className="potm">
-          <a href={featured.src} onClick={(e) => { e.preventDefault(); show(0); }}>
-            <img
-              src={featured.src}
-              alt={featured.alt}
-              width={featured.width}
-              height={featured.height}
-              fetchPriority="high"
-            />
-          </a>
-        </div>
-
         <div className="section-bar" id="fresh">&#9733; Fresh Prints</div>
         <Desk photos={freshPrints} onOpen={(p) => show(viewerPhotos.indexOf(p))} />
         <p className="desk-hint">push them around, or click one to look closer.</p>
 
         <div className="section-bar" id="album">&#9733; My Photo Album ({albumPhotos.length} photos)</div>
-        <Album photos={albumPhotos} narrow={narrow} onOpen={(i) => show(i + 1)} />
+        <Album photos={albumPhotos} narrow={narrow} onOpen={show} />
 
         <div className="rainbow-rule" />
 
