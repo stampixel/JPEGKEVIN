@@ -264,8 +264,8 @@ body { background-image: none; }
   .desk .print .print-date { font-size: 10px; bottom: 3px; left: 6px; }
 }
 
-/* The album is a building: a CN Tower gauge beside the page on wide screens,
-   a slim strip down the right edge on narrow ones. Never interactive. */
+/* The album is a building: a CN Tower gauge beside the page on wide screens;
+   on narrow screens just the height label, riding the right edge. Never interactive. */
 .gauge-inert { pointer-events: none; user-select: none; }
 .gauge { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); height: 74vh; width: 190px; font-family: "Courier New", Courier, monospace; }
 .gauge svg { position: absolute; right: 0; top: 0; height: 100%; width: auto; }
@@ -277,16 +277,14 @@ body { background-image: none; }
 .gauge .beacon { animation: beacon 1.4s steps(2, start) infinite; }
 @keyframes beacon { 50% { opacity: 0; } }
 @media (max-width: 1259px) { .gauge { display: none; } }
-.gauge-slim { position: fixed; right: 2px; top: 6vh; top: 6svh; height: 88vh; height: 88svh; width: 26px; z-index: 5; }
-.gauge-slim svg { display: block; width: 100%; height: 100%; }
-.gauge-slim .gauge-marker { left: -4px; right: 0; }
-.gauge-slim .gauge-label { right: 30px; top: -11px; max-width: none; white-space: nowrap; font-size: 11px; padding: 2px 6px; }
-.gauge-slim .beacon { animation: beacon 1.4s steps(2, start) infinite; }
-/* Narrow screens: a gutter for the strip, and room below the content so the
-   "street level" label at the bottom of the strip never covers anything. */
-@media (max-width: 1259px) { body.has-gauge { padding-right: 30px; padding-bottom: 130px; } }
+.gauge-slim { position: fixed; right: 0; top: 6vh; top: 6svh; height: 88vh; height: 88svh; width: 0; z-index: 5; }
+.gauge-slim .gauge-marker { left: auto; right: 0; width: 0; border-top: 0; }
+.gauge-slim .gauge-label { right: 0; top: -11px; max-width: none; white-space: nowrap; font-size: 11px; padding: 2px 7px; border-right: 0; }
+/* Narrow screens: room below the content so the "street level" label at the
+   bottom of the edge never covers anything. */
+@media (max-width: 1259px) { body.has-gauge { padding-bottom: 130px; } }
 @media (min-width: 1260px) { .gauge-slim { display: none; } }
-@media (prefers-reduced-motion: reduce) { .gauge-marker { transition: none; } .gauge .beacon, .gauge-slim .beacon { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .gauge-marker { transition: none; } .gauge .beacon { animation: none; } }
 
 /* Viewer extras and the postcard window */
 .win-status .win-extra { flex: 1; text-align: center; }

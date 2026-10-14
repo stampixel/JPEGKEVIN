@@ -1,54 +1,38 @@
 import { describe, it, expect } from 'vitest';
-import { groupRows } from './rows.js';
+import { packRows } from './rows.js';
 
 const L = (name) => ({ name, width: 2048, height: 1365 });
 const P = (name) => ({ name, width: 1365, height: 2048 });
 const names = (rows) => rows.map((row) => row.map((p) => p.name));
 
-describe('groupRows on wide screens', () => {
-  it('puts landscapes two to a row', () => {
-    const rows = groupRows([L('a'), L('b'), L('c'), L('d')]);
-    expect(names(rows)).toEqual([['a', 'b'], ['c', 'd']]);
+describe('packRows on wide screens', () => {
+  it('keeps photos strictly in order, two landscapes or three portraits to a row', () => {
+    expect(names(packRows([L('a'), L('b'), L('c'), L('d')]))).toEqual([['a', 'b'], ['c', 'd']]);
+    expect(names(packRows([P('a'), P('b'), P('c')]))).toEqual([['a', 'b', 'c']]);
   });
 
-  it('puts portraits three to a row', () => {
-    const rows = groupRows([P('a'), P('b'), P('c')]);
-    expect(names(rows)).toEqual([['a', 'b', 'c']]);
+  it('mixes orientations rather than moving a photo out of order', () => {
+    const rows = packRows([L('l1'), P('p1'), L('l2'), P('p2'), P('p3'), L('l3')]);
+    expect(names(rows)).toEqual([['l1', 'p1'], ['l2', 'p2'], ['p3', 'l3']]);
+    expect(rows.flat().map((p) => p.name)).toEqual(['l1', 'p1', 'l2', 'p2', 'p3', 'l3']);
   });
 
-  it('never mixes orientations in a row and emits each row as soon as it fills', () => {
-    const rows = groupRows([L('l1'), P('p1'), L('l2'), P('p2'), P('p3')]);
-    expect(names(rows)).toEqual([['l1', 'l2'], ['p1', 'p2', 'p3']]);
-  });
-
-  it('gives a leftover landscape its own row and keeps leftover portraits together', () => {
-    const rows = groupRows([L('l1'), L('l2'), L('l3'), P('p1'), P('p2')]);
-    expect(names(rows)).toEqual([['l1', 'l2'], ['l3'], ['p1', 'p2']]);
-  });
-
-  it('flushes leftovers in the order they first appeared', () => {
-    const rows = groupRows([P('p1'), L('l1')]);
-    expect(names(rows)).toEqual([['p1'], ['l1']]);
-  });
-
-  it('places a row that filled late near where it started, not at the end', () => {
-    const rows = groupRows([L('l1'), P('p1'), L('l2'), L('l3'), L('l4'), P('p2'), P('p3')]);
-    expect(names(rows)).toEqual([['l1', 'l2'], ['p1', 'p2', 'p3'], ['l3', 'l4']]);
+  it('leaves whatever is left as a shorter final row', () => {
+    expect(names(packRows([L('a'), L('b'), L('c')]))).toEqual([['a', 'b'], ['c']]);
+    expect(names(packRows([P('a')]))).toEqual([['a']]);
   });
 
   it('returns no rows for no photos', () => {
-    expect(groupRows([])).toEqual([]);
+    expect(packRows([])).toEqual([]);
   });
 });
 
-describe('groupRows on narrow screens', () => {
-  it('puts landscapes one to a row and portraits two to a row', () => {
-    const rows = groupRows([L('l1'), P('p1'), P('p2'), L('l2')], { narrow: true });
-    expect(names(rows)).toEqual([['l1'], ['p1', 'p2'], ['l2']]);
+describe('packRows on narrow screens', () => {
+  it('puts a landscape alone and portraits in pairs, still in order', () => {
+    expect(names(packRows([L('l1'), P('p1'), P('p2'), L('l2')], { narrow: true }))).toEqual([['l1'], ['p1', 'p2'], ['l2']]);
   });
 
-  it('gives a leftover portrait its own row', () => {
-    const rows = groupRows([P('p1'), P('p2'), P('p3')], { narrow: true });
-    expect(names(rows)).toEqual([['p1', 'p2'], ['p3']]);
+  it('pairs a lone portrait with the landscape that follows it', () => {
+    expect(names(packRows([P('p1'), L('l1'), P('p2')], { narrow: true }))).toEqual([['p1', 'l1'], ['p2']]);
   });
 });

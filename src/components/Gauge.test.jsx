@@ -18,10 +18,11 @@ describe('Gauge', () => {
     expect(container.querySelector('.gauge-marker').style.top).toBe('100%');
   });
 
-  it('has a slim edge version for narrow screens, with the same marker and label but no ticks', () => {
+  it('has an edge version for narrow screens: just the label on a marker, no tower and no ticks', () => {
     const { container } = render(<Gauge height={350} slim />);
     expect(container.querySelector('.gauge-slim')).toBeTruthy();
     expect(container.querySelector('.gauge')).toBeNull();
+    expect(container.querySelector('svg')).toBeNull();
     expect(container.querySelectorAll('.gauge-tick')).toHaveLength(0);
     expect(container.querySelector('.gauge-label').textContent).toBe('about 350 m up, 106th floor');
     expect(parseFloat(container.querySelector('.gauge-marker').style.top)).toBeCloseTo(100 - (350 / 553) * 100, 1);
