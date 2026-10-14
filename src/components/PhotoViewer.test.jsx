@@ -70,4 +70,11 @@ describe('PhotoViewer', () => {
     unmount();
     expect(document.title).toBe('Kevin Tang');
   });
+
+  it('offers to send the photo as a postcard when asked to', () => {
+    const onPostcard = vi.fn();
+    render(<PhotoViewer photos={photos} index={2} onChange={noop} onClose={noop} onPostcard={onPostcard} />);
+    fireEvent.click(screen.getByRole('button', { name: 'send as postcard' }));
+    expect(onPostcard).toHaveBeenCalledWith(photos[2]);
+  });
 });

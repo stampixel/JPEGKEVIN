@@ -1,5 +1,6 @@
 import manifest from 'virtual:photos';
 import { orderByPreference } from './lib/order.js';
+import { HEIGHTS } from './heights.js';
 
 // Every image in src/assets/portfolio is on the site: drop a file in and it shows up.
 // The list below only decides order; photos not named here follow it, sorted by file name.
@@ -48,7 +49,11 @@ const ALT = {
   'DSC02249.jpg': 'Rooftops of old downtown skyscrapers at blue hour, a person near the edge',
 };
 
-const all = manifest.map((photo) => ({ ...photo, alt: ALT[photo.name] ?? 'Photograph by Kevin Tang' }));
+export const all = manifest.map((photo) => ({
+  ...photo,
+  alt: ALT[photo.name] ?? 'Photograph by Kevin Tang',
+  altitude: HEIGHTS[photo.name] ?? null,
+}));
 
 export const featured = all.find((photo) => photo.name === FEATURED) ?? all[0];
 export const album = orderByPreference(all.filter((photo) => photo !== featured), ORDER);

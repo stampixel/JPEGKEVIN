@@ -1,15 +1,28 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { imageSize } from 'image-size';
+import exifr from 'exifr';
 
 const VIRTUAL_ID = 'virtual:photos';
 const RESOLVED_ID = '\0' + VIRTUAL_ID;
 const IMAGE = /\.(jpe?g|png|webp)$/i;
 
-// Turns a folder of images into an importable list of { name, src, width, height }.
-// Pixel sizes are read from the file headers at build time, so the page can lay photos
-// out by orientation without downloading them first. The files themselves go through
-// Vite's normal asset pipeline, so the originals are served untouched.
+// Turns a folder of images into an importable list of { name, src, width, height, taken }.
+// Pixel sizes and the EXIF capture time are read at build time, so the page can lay photos
+// out by orientation and find the newest ones without downloading them first. The files
+// themselves go through Vite's normal asset pipeline, so the originals are served untouched.
+// "2025:12:21 01:28:01" from the camera, as "2025-12-21T01:28:01" (no time zone: it is camera time).
+async function captureTime(buffer) {
+  try {
+    const exif = await exifr.parse(buffer, { pick: ['DateTimeOriginal', 'CreateDate'], reviveValues: false });
+    const raw = exif?.DateTimeOriginal || exif?.CreateDate;
+    const m = typeof raw === 'string' && /^(\d{4}):(\d{2}):(\d{2}) (\d{2}:\d{2}:\d{2})/.exec(raw);
+    return m ? m[1] + '-' + m[2] + '-' + m[3] + 'T' + m[4] : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function photoManifest({ dir = 'src/assets/portfolio' } = {}) {
   let folder;
 
@@ -24,16 +37,18 @@ export default function photoManifest({ dir = 'src/assets/portfolio' } = {}) {
       if (id === VIRTUAL_ID) return RESOLVED_ID;
     },
 
-    load(id) {
+    async load(id) {
       if (id !== RESOLVED_ID) return;
       const files = readdirSync(folder).filter((file) => IMAGE.test(file)).sort();
       const imports = [];
       const entries = [];
-      files.forEach((file, i) => {
-        const { width, height } = imageSize(readFileSync(path.join(folder, file)));
+      for (const [i, file] of files.entries()) {
+        const buffer = readFileSync(path.join(folder, file));
+        const { width, height } = imageSize(buffer);
+        const taken = await captureTime(buffer);
         imports.push('import src' + i + ' from ' + JSON.stringify('/' + dir + '/' + file) + ';');
-        entries.push('  { name: ' + JSON.stringify(file) + ', src: src' + i + ', width: ' + width + ', height: ' + height + ' },');
-      });
+        entries.push('  { name: ' + JSON.stringify(file) + ', src: src' + i + ', width: ' + width + ', height: ' + height + ', taken: ' + JSON.stringify(taken) + ' },');
+      }
       return imports.join('\n') + '\nexport default [\n' + entries.join('\n') + '\n];\n';
     },
 

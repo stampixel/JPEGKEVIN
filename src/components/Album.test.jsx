@@ -30,4 +30,11 @@ describe('Album', () => {
     expect(onOpen).toHaveBeenCalledWith(3);
     expect(followed).toBe(false);
   });
+
+  it('labels each row with the height of its highest photo, for the gauge', () => {
+    const withHeights = [{ ...L('a.jpg'), altitude: 300 }, { ...L('b.jpg'), altitude: 120 }, { ...P('c.jpg'), altitude: null }];
+    const { container } = render(<Album photos={withHeights} onOpen={noop} />);
+    const rows = [...container.querySelectorAll('.row')].map((r) => r.dataset.height);
+    expect(rows).toEqual(['300', '']);
+  });
 });

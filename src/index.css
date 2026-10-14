@@ -149,12 +149,14 @@ a:focus-visible, button:focus-visible { outline: 2px dotted #FF0000; outline-off
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  min-width: 0;
   background: linear-gradient(90deg, #000080, #1084D0);
   color: #FFFFFF;
   font-weight: bold;
   padding: 3px 3px 3px 8px;
   white-space: nowrap;
 }
+.win-title > span { overflow: hidden; text-overflow: ellipsis; }
 .win-x {
   width: 20px;
   height: 18px;
@@ -187,12 +189,14 @@ a:focus-visible, button:focus-visible { outline: 2px dotted #FF0000; outline-off
 }
 .win-status {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
-  gap: 12px;
+  gap: 2px 12px;
   padding: 2px 4px 1px;
   white-space: nowrap;
 }
+@media (max-width: 520px) { .win-dims { display: none; } }
 .win-status .linkish {
   background: none;
   border: 0;
@@ -203,3 +207,100 @@ a:focus-visible, button:focus-visible { outline: 2px dotted #FF0000; outline-off
   cursor: pointer;
 }
 .win-status .linkish:active, .win-status a:active { color: #FF0000; }
+
+/* The real sky, drawn behind the page */
+body { background-image: none; }
+.sky { position: fixed; inset: 0; z-index: -1; }
+.sky-caption {
+  position: fixed;
+  right: 16px;
+  bottom: 12px;
+  max-width: calc((100vw - 800px) / 2 - 36px);
+  font: 11px/1.6 "Courier New", Courier, monospace;
+  color: #9f9fe0;
+  text-align: right;
+  text-shadow: 0 0 6px #000030, 0 0 2px #000030;
+}
+@media (max-width: 1259px) {
+  .sky-caption { position: static; max-width: none; text-align: center; padding: 14px 8px 0; }
+}
+
+/* Fresh prints: loose prints on a desk mat */
+.desk {
+  position: relative;
+  height: 420px;
+  background: #3b3b3b;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 1px, transparent 1px 7px);
+  border: 2px inset #808080;
+  overflow: hidden;
+  touch-action: none;
+}
+.desk .print {
+  position: absolute;
+  left: min(var(--left), 68%);
+  top: min(var(--top), 58%);
+  width: 30%;
+  margin: 0;
+  padding: 8px 8px 26px;
+  background: #FFFFFF;
+  border: 0;
+  box-shadow: 3px 4px 0 rgba(0,0,0,.55);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-drag: none;
+  text-align: left;
+}
+.desk .print.portrait { width: 22%; }
+.desk .print:active { cursor: grabbing; box-shadow: 8px 12px 0 rgba(0,0,0,.5); }
+.desk .print img { display: block; width: 100%; height: auto; pointer-events: none; }
+.desk .print .print-date { position: absolute; left: 10px; bottom: 5px; font: 12px "Comic Sans MS", "Comic Neue", cursive; color: #555555; }
+.desk-hint { text-align: center; font: 12px "Courier New", Courier, monospace; color: #444444; margin: 6px 0 0; }
+@media (max-width: 640px) {
+  .desk { height: 360px; }
+  .desk .print { width: 46%; left: min(var(--left), 52%); top: min(var(--top), 52%); padding: 5px 5px 20px; }
+  .desk .print.portrait { width: 34%; left: min(var(--left), 64%); }
+  .desk .print .print-date { font-size: 10px; bottom: 3px; left: 6px; }
+}
+
+/* The album is a building: a CN Tower gauge beside the page on wide screens,
+   a slim strip down the right edge on narrow ones. Never interactive. */
+.gauge-inert { pointer-events: none; user-select: none; }
+.gauge { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); height: 74vh; width: 190px; font-family: "Courier New", Courier, monospace; }
+.gauge svg { position: absolute; right: 0; top: 0; height: 100%; width: auto; }
+.gauge-tick { position: absolute; left: 0; width: calc(100% - 46px); border-top: 1px dotted #6a6ab8; font-size: 10px; color: #9a9ae0; line-height: 1; padding-top: 2px; white-space: nowrap; }
+.gauge-marker { position: absolute; left: -10px; right: -6px; height: 0; border-top: 2px solid #FFFF00; transition: top .45s ease; }
+.gauge-marker.unknown { border-top-style: dotted; border-top-color: #9a9ae0; }
+/* The label stays inside the gauge's own box, left of the tower, so it never reaches over the page. */
+.gauge-label { position: absolute; right: 50px; top: 6px; max-width: 128px; text-align: right; background: #FFFFE1; color: #000000; border: 1px solid #000000; padding: 3px 6px; font: 12px/1.3 "MS Sans Serif", Tahoma, Geneva, sans-serif; box-shadow: 2px 2px 0 rgba(0,0,0,.5); }
+.gauge .beacon { animation: beacon 1.4s steps(2, start) infinite; }
+@keyframes beacon { 50% { opacity: 0; } }
+@media (max-width: 1259px) { .gauge { display: none; } }
+.gauge-slim { position: fixed; right: 2px; top: 6vh; top: 6svh; height: 88vh; height: 88svh; width: 26px; z-index: 5; }
+.gauge-slim svg { display: block; width: 100%; height: 100%; }
+.gauge-slim .gauge-marker { left: -4px; right: 0; }
+.gauge-slim .gauge-label { right: 30px; top: -11px; max-width: none; white-space: nowrap; font-size: 11px; padding: 2px 6px; }
+.gauge-slim .beacon { animation: beacon 1.4s steps(2, start) infinite; }
+/* Narrow screens: a gutter for the strip, and room below the content so the
+   "street level" label at the bottom of the strip never covers anything. */
+@media (max-width: 1259px) { body.has-gauge { padding-right: 30px; padding-bottom: 130px; } }
+@media (min-width: 1260px) { .gauge-slim { display: none; } }
+@media (prefers-reduced-motion: reduce) { .gauge-marker { transition: none; } .gauge .beacon, .gauge-slim .beacon { animation: none; } }
+
+/* Viewer extras and the postcard window */
+.win-status .win-extra { flex: 1; text-align: center; }
+.btn95 { font-family: "MS Sans Serif", Tahoma, Geneva, sans-serif; font-size: 13px; background: #C0C0C0; border: 2px outset #FFFFFF; padding: 4px 14px; cursor: pointer; }
+.btn95:active { border-style: inset; }
+.postcard { z-index: 11; }
+.postcard .win { width: min(680px, calc(100vw - 28px)); }
+.postcard-body { background: #C0C0C0; border: 0; display: block; padding: 10px 10px 6px; }
+.postcard-card { position: relative; width: 100%; aspect-ratio: 3 / 2; cursor: pointer; perspective: 1400px; }
+.postcard-card canvas { position: absolute; inset: 0; width: 100%; height: 100%; backface-visibility: hidden; transition: transform .6s ease; box-shadow: 3px 3px 0 rgba(0,0,0,.45); }
+.postcard-card canvas.back { transform: rotateY(180deg); }
+.postcard-card.flipped canvas.front { transform: rotateY(180deg); }
+.postcard-card.flipped canvas.back { transform: rotateY(0deg); }
+.postcard-hint { display: block; font: 12px "MS Sans Serif", Tahoma, Geneva, sans-serif; margin: 8px 2px 4px; }
+.postcard textarea { width: 100%; box-sizing: border-box; height: 64px; font: 14px "Comic Sans MS", "Comic Neue", cursive; padding: 4px 6px; border: 2px inset #808080; background: #FFFFFF; resize: vertical; }
+.postcard-buttons { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+@media (prefers-reduced-motion: reduce) { .postcard-card canvas { transition: none; } }
