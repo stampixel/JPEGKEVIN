@@ -9,7 +9,7 @@ describe('Gauge', () => {
     const { container } = render(<Gauge height={142} />);
     expect(container.querySelector('.gauge-label').textContent).toBe('about 142 m up, 43rd floor');
     const top = parseFloat(container.querySelector('.gauge-marker').style.top);
-    expect(top).toBeCloseTo(100 - (142 / 553) * 100, 1);
+    expect(top).toBeCloseTo(100 - (142 / 381) * 100, 1);
   });
 
   it('sits at street level for the ground and says so', () => {
@@ -49,5 +49,22 @@ describe('Gauge', () => {
       expect(container.querySelector('.gauge-label')).toBeTruthy();
       unmount();
     }
+  });
+
+  it('uses the Empire State Building as the scale, names it at the top, and clamps anything taller', () => {
+    const { container } = render(<Gauge height={500} />);
+    expect(container.querySelector('.gauge-marker').style.top).toBe('0%');
+    const ticks = [...container.querySelectorAll('.gauge-tick')].map((t) => t.textContent);
+    expect(ticks[0]).toContain('381 m');
+    expect(ticks[0]).toContain('Empire State Building');
+    expect(ticks.at(-1)).toBe('street level');
+    expect(container.querySelector('svg .beacon')).toBeTruthy();
+  });
+
+  it('draws no building at all in the phone version', () => {
+    const { container } = render(<Gauge height={120} slim progress={0.3} />);
+    expect(container.querySelector('svg')).toBeNull();
+    expect(container.querySelector('.gauge-tick')).toBeNull();
+    expect(container.querySelector('.gauge-marker').style.top).toBe('30%');
   });
 });
