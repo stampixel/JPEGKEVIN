@@ -23,7 +23,6 @@ export const HEIGHTS = {
   'DSC03665.jpg': 90,
   'DSC04050.jpg': 180, // guess
   'DSC04090-2.jpg': 180,
-  'DSC04090.jpg': 180,
   'DSC04148.jpg': 180,
   'DSC04214.jpg': 0,
   'DSC04489.jpg': 180,
@@ -45,4 +44,5 @@ export const HEIGHTS = {
   'SONY ILCE-6100 6048x4024_001691.jpg': 80,
   'SONY ILCE-6100 6048x4024_001942.jpg': 100,
   'SONY ILCE-6100 6048x4024_002148.jpg': 180,
+  'DSC00527.jpg': 185,
 };
