@@ -44,12 +44,13 @@ function useGauge(enabled) {
     const update = () => {
       const album = document.querySelector('.album')?.getBoundingClientRect();
       if (!album) return;
+      const footerTop = document.querySelector('.footer')?.getBoundingClientRect().top ?? Infinity;
       const rows = [...document.querySelectorAll('.album .row')].map((el) => {
         const r = el.getBoundingClientRect();
         const raw = el.dataset.height;
         return { top: r.top, bottom: r.bottom, value: raw === '' || raw == null ? null : Number(raw) };
       });
-      setState(trackGauge({ rows, albumTop: album.top, albumBottom: album.bottom, viewportHeight: window.innerHeight }));
+      setState(trackGauge({ rows, albumTop: album.top, albumBottom: album.bottom, footerTop, viewportHeight: window.innerHeight }));
     };
     update();
     window.addEventListener('scroll', update, { passive: true });

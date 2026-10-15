@@ -45,6 +45,12 @@ describe('trackGauge', () => {
     expect(trackGauge({ rows, albumTop: 100, albumBottom: 1100, viewportHeight: 800 })).toEqual({ visible: true, height: 200, progress: 0.26 });
   });
 
+  it('hides as soon as the footer comes on screen, so the label never sits on the footer or caption', () => {
+    const rows = [{ top: 100, bottom: 600, value: 0 }];
+    expect(trackGauge({ rows, albumTop: -2000, albumBottom: 600, footerTop: 700, viewportHeight: 800 }).visible).toBe(false);
+    expect(trackGauge({ rows, albumTop: -2000, albumBottom: 600, footerTop: 900, viewportHeight: 800 }).visible).toBe(true);
+  });
+
   it('hides again once the whole album has scrolled past the line', () => {
     const rows = [{ top: -900, bottom: -700, value: 0 }];
     expect(trackGauge({ rows, albumTop: -3000, albumBottom: -700, viewportHeight: 800 })).toEqual({ visible: false, height: 0, progress: 1 });

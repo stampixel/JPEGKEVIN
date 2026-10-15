@@ -31,11 +31,12 @@ export function nearestRow(rows, y) {
 }
 
 // What the gauge should show for the current scroll position. The reading line sits
-// 45% down the screen; the gauge is visible while the album spans it, reads the row on
-// it, and reports how far through the album that line is (0 at the top, 1 at the end).
-export function trackGauge({ rows, albumTop, albumBottom, viewportHeight }) {
+// 45% down the screen; the gauge is visible while the album spans it and the footer is
+// still below the screen, reads the row on the line, and reports how far through the
+// album that line is (0 at the top, 1 at the end).
+export function trackGauge({ rows, albumTop, albumBottom, footerTop = Infinity, viewportHeight }) {
   const line = viewportHeight * 0.45;
-  const visible = albumTop <= line && albumBottom >= line;
+  const visible = albumTop <= line && albumBottom >= line && footerTop >= viewportHeight;
   const span = Math.max(1, albumBottom - albumTop);
   const progress = Math.min(1, Math.max(0, (line - albumTop) / span));
   return { visible, height: nearestRow(rows, line) ?? null, progress: Math.round(progress * 100) / 100 };
