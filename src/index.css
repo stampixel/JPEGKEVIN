@@ -134,12 +134,13 @@ a:focus-visible, button:focus-visible { outline: 2px dotted var(--ink); outline-
   .sky-caption { position: static; max-width: none; text-align: center; padding: 14px 8px 0; }
 }
 
-/* The album is a building: a CN Tower beside the page on wide screens; on narrow
-   screens just the height label, travelling the right edge. Never interactive. */
+/* The album is a building: the Empire State Building beside the page on wide
+   screens; on narrow screens just the height label, travelling the right edge. Never interactive. */
 .gauge-inert { pointer-events: none; user-select: none; transition: opacity .3s ease; }
 .gauge-hidden { opacity: 0; }
 .gauge { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); height: 74vh; width: 190px; }
-.gauge svg { position: absolute; right: 0; top: 0; height: 100%; width: auto; }
+.gauge svg { position: absolute; right: 0; top: 0; height: 100%; width: auto; overflow: visible; }
+.gauge-tick small { display: block; font-size: 10px; margin-top: 2px; }
 .gauge-tick {
   position: absolute;
   left: 0;
