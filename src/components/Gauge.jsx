@@ -19,25 +19,29 @@ function Tower() {
 }
 
 // Shows how high the photos in view were taken from. Wide screens get the CN Tower
-// beside the page with a scale; narrow screens get just the label, riding up and down
-// the right edge. Purely informational: it never takes a tap.
-export default function Gauge({ height, slim = false }) {
+// beside the page, the marker at that height on the tower. Narrow screens get just the
+// label on the right edge, placed by how far through the album the reader is, so it
+// travels from the top of the screen to the bottom like a scrollbar. Purely
+// informational: it never takes a tap, and it fades out when the album is not in view.
+export default function Gauge({ height, slim = false, hidden = false, progress = 0 }) {
   const known = height != null;
+  const top = slim ? progress * 100 : known ? pct(height) : 50;
   const marker = (
-    <div className={'gauge-marker' + (known ? '' : ' unknown')} style={{ top: (known ? pct(height) : 50) + '%' }}>
+    <div className={'gauge-marker' + (known ? '' : ' unknown')} style={{ top: top + '%' }}>
       <div className="gauge-label">{describeHeight(height)}</div>
     </div>
   );
+  const hiddenClass = hidden ? ' gauge-hidden' : '';
 
   if (slim) {
     return (
-      <div className="gauge-slim gauge-inert" aria-hidden="true">
+      <div className={'gauge-slim gauge-inert' + hiddenClass} aria-hidden="true">
         {marker}
       </div>
     );
   }
   return (
-    <div className="gauge gauge-inert" aria-hidden="true">
+    <div className={'gauge gauge-inert' + hiddenClass} aria-hidden="true">
       <Tower />
       {TICKS.map(([m, label]) => <div key={m} className="gauge-tick" style={{ top: pct(m) + '%' }}>{label}</div>)}
       {marker}

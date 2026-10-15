@@ -7,7 +7,7 @@ import PostcardDialog from './components/PostcardDialog.jsx';
 import Sky from './components/Sky.jsx';
 import { album, all } from './photos.js';
 import { newest } from './lib/fresh.js';
-import { orderByHeight, describeHeight, nearestRow } from './lib/heights.js';
+import { orderByHeight, describeHeight, trackGauge } from './lib/heights.js';
 
 // Once heights are filled in, the album becomes a building: highest photo first.
 const heightsKnown = all.some((p) => p.altitude != null);
@@ -35,27 +35,28 @@ function useMediaQuery(query) {
   return matches;
 }
 
-// The height of whatever row of photos is in the middle of the screen right now.
-function useHeightInView(enabled) {
-  const [height, setHeight] = useState(albumPhotos[0]?.altitude ?? null);
+// What the gauge should show for the current scroll position: the height of the row
+// of photos on the reading line, whether the album is in view, and how far through it we are.
+function useGauge(enabled) {
+  const [state, setState] = useState({ visible: false, height: albumPhotos[0]?.altitude ?? null, progress: 0 });
   useEffect(() => {
     if (!enabled) return undefined;
     const update = () => {
-      const line = window.innerHeight * 0.45;
-      if (document.querySelector('.footer')?.getBoundingClientRect().top < window.innerHeight) { setHeight(0); return; }
+      const album = document.querySelector('.album')?.getBoundingClientRect();
+      if (!album) return;
       const rows = [...document.querySelectorAll('.album .row')].map((el) => {
         const r = el.getBoundingClientRect();
         const raw = el.dataset.height;
         return { top: r.top, bottom: r.bottom, value: raw === '' || raw == null ? null : Number(raw) };
       });
-      setHeight(nearestRow(rows, line) ?? null);
+      setState(trackGauge({ rows, albumTop: album.top, albumBottom: album.bottom, viewportHeight: window.innerHeight }));
     };
     update();
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     return () => { window.removeEventListener('scroll', update); window.removeEventListener('resize', update); };
   }, [enabled]);
-  return height;
+  return state;
 }
 
 function App() {
@@ -64,7 +65,7 @@ function App() {
   const [open, setOpen] = useState(indexFromHash);
   const [postcard, setPostcard] = useState(null);
   const returnTo = useRef(null);
-  const heightInView = useHeightInView(heightsKnown);
+  const gauge = useGauge(heightsKnown);
 
   const show = (index) => {
     returnTo.current = document.activeElement;
@@ -74,11 +75,6 @@ function App() {
     setOpen(null);
     returnTo.current?.focus?.();
   };
-
-  // On narrow screens the slim gauge needs a gutter down the right edge.
-  useEffect(() => {
-    document.body.classList.toggle('has-gauge', heightsKnown);
-  }, []);
 
   useEffect(() => {
     document.documentElement.style.overflow = open === null ? '' : 'hidden';
@@ -126,7 +122,7 @@ function App() {
       </div>
 
       <Sky />
-      {heightsKnown && <Gauge height={heightInView} slim={slimGauge} />}
+      {heightsKnown && <Gauge height={gauge.height} slim={slimGauge} hidden={!gauge.visible} progress={gauge.progress} />}
 
       {open !== null && (
         <PhotoViewer
