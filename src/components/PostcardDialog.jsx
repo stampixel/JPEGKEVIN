@@ -32,7 +32,7 @@ export default function PostcardDialog({ photo, onClose }) {
     img.src = photo.src;
     const st = new Image();
     st.onload = () => setStamp(st);
-    st.src = '/favicon.svg';
+    st.src = '/stamp.svg';
   }, [photo]);
 
   useEffect(() => {
@@ -74,9 +74,9 @@ export default function PostcardDialog({ photo, onClose }) {
   return (
     <div className="win-overlay postcard" role="dialog" aria-modal="true" aria-label="Postcard" onKeyDown={onKeyDown} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="win">
-        <div className="win-title win-chrome">
+        <div className="win-title">
+          <button ref={closeRef} className="win-x" type="button" aria-label="Close" onClick={onClose} />
           <span>Postcard</span>
-          <button ref={closeRef} className="win-x" type="button" aria-label="Close" onClick={onClose}>&#10005;</button>
         </div>
         <div className="win-body postcard-body">
           <div className={'postcard-card' + (flipped ? ' flipped' : '')} onClick={() => setFlipped((f) => !f)} title="Click to flip the card over">
@@ -86,9 +86,9 @@ export default function PostcardDialog({ photo, onClose }) {
           <label className="postcard-hint" htmlFor="postcard-note">Write a note on the back (optional)</label>
           <textarea id="postcard-note" maxLength={220} value={note} onChange={(e) => setNote(e.target.value)} placeholder="wish you were up here" />
           <div className="postcard-buttons">
-            <button className="btn95" type="button" onClick={() => setFlipped((f) => !f)}>Flip</button>
-            {shareable && <button className="btn95" type="button" onClick={share}>Share</button>}
-            <button className="btn95" type="button" onClick={download}>Download this side</button>
+            <button className="btn" type="button" onClick={() => setFlipped((f) => !f)}>Flip</button>
+            {shareable && <button className="btn" type="button" onClick={share}>Share</button>}
+            <button className="btn" type="button" onClick={download}>Download this side</button>
           </div>
         </div>
       </div>

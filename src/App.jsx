@@ -86,40 +86,43 @@ function App() {
   return (
     <>
       <div className="page" inert={open !== null}>
-        <div className="masthead">
-          <h1>Kevin Tang</h1>
-        </div>
+        <section className="window" aria-labelledby="site-title">
+          <h1 className="titlebar" id="site-title"><span>Kevin Tang</span></h1>
+          <div className="about">
+            <p>
+              I think some questions are too big to answer. I don’t have any deeper reason on why I risk my
+              life to take photos. I just kinda do it. Throughout life I’ve also noticed people who are good at one
+              thing often have other things they are equally as good at, even if it is in a completely
+              unadjacent field. I hope the photos I take while freeclimbing/urbexing are that ‘unadjacent’
+              field.
+            </p>
+            <p>
+              I don’t do anything I don’t enjoy, and some of the things I do enjoy are: programming,
+              photography, cycling, and writing. I occasionally smoke too, it’s fun. I don’t have a lot of
+              achievements, however some of the things I’m proud of are: 5-figure dropshipping business in
+              high school, solo traveling to climb buildings, knowing how to lockpick really well, and being
+              able to provide for my family. I am also proud of myself as a person. I hope I can make an impact
+              on this world.
+            </p>
+          </div>
+        </section>
 
-        <div className="about">
-          <p>
-            I think some questions are too big to answer. I don’t have any deeper reason on why I risk my
-            life to take photos. I just kinda do it. Throughout life I’ve also noticed people who are good at one
-            thing often have other things they are equally as good at, even if it is in a completely
-            unadjacent field. I hope the photos I take while freeclimbing/urbexing are that ‘unadjacent’
-            field.
-          </p>
-          <p>
-            I don’t do anything I don’t enjoy, and some of the things I do enjoy are: programming,
-            photography, cycling, and writing. I occasionally smoke too, it’s fun. I don’t have a lot of
-            achievements, however some of the things I’m proud of are: 5-figure dropshipping business in
-            high school, solo traveling to climb buildings, knowing how to lockpick really well, and being
-            able to provide for my family. I am also proud of myself as a person. I hope I can make an impact
-            on this world.
-          </p>
-        </div>
+        <section className="window" aria-labelledby="fresh-title">
+          <h2 className="titlebar" id="fresh-title"><span>Fresh Prints</span></h2>
+          <div className="window-body">
+            <Desk photos={freshPrints} onOpen={(p) => show(viewerPhotos.indexOf(p))} />
+            <p className="desk-hint">push them around, or click one to look closer.</p>
+          </div>
+        </section>
 
-        <div className="rainbow-rule" />
+        <section className="window" aria-labelledby="album-title">
+          <h2 className="titlebar" id="album-title"><span>My Photo Album ({albumPhotos.length} photos)</span></h2>
+          <div className="window-body">
+            <Album photos={albumPhotos} narrow={narrow} onOpen={show} />
+          </div>
+        </section>
 
-        <div className="section-bar" id="fresh">&#9733; Fresh Prints</div>
-        <Desk photos={freshPrints} onOpen={(p) => show(viewerPhotos.indexOf(p))} />
-        <p className="desk-hint">push them around, or click one to look closer.</p>
-
-        <div className="section-bar" id="album">&#9733; My Photo Album ({albumPhotos.length} photos)</div>
-        <Album photos={albumPhotos} narrow={narrow} onOpen={show} />
-
-        <div className="rainbow-rule" />
-
-        <div className="footer">&copy; Kevin Tang. All photos taken by ME.</div>
+        <footer className="footer">&copy; Kevin Tang. All photos taken by ME.</footer>
       </div>
 
       <Sky />

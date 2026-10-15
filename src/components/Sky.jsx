@@ -19,7 +19,7 @@ function drawSky(canvas, now) {
   const lst = localSiderealTime(jd, TORONTO.lon);
   ctx.clearRect(0, 0, W, H);
 
-  ctx.strokeStyle = 'rgba(150,150,230,0.16)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.10)';
   ctx.lineWidth = 1;
   for (const segment of LINES) {
     let prev = null;
@@ -41,8 +41,8 @@ function drawSky(canvas, now) {
     ctx.beginPath(); ctx.arc(pt.x, pt.y, starSize(mag), 0, Math.PI * 2); ctx.fill();
   }
   ctx.globalAlpha = 1;
-  ctx.fillStyle = 'rgba(175,175,235,0.45)';
-  ctx.font = '11px "Courier New", monospace';
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.font = '11px Geneva, Verdana, sans-serif';
   ctx.textAlign = 'center';
   for (const [ra, dec, name] of NAMES) {
     if (!FAMOUS.has(name)) continue;
@@ -64,7 +64,7 @@ function drawSky(canvas, now) {
     ctx.fillStyle = phase.fraction > 0.5 ? '#f3efd8' : '#0a0a3a';
     ctx.beginPath(); ctx.ellipse(pt.x, pt.y, Math.max(0.5, r * Math.abs(Math.cos((phase.elongation * Math.PI) / 180))), r, 0, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
-    ctx.fillStyle = 'rgba(175,175,235,0.7)';
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
     ctx.fillText('moon', pt.x, pt.y + r + 13);
   }
   return { daylight: sunAltitude(jd, TORONTO) > -6, moonUp: moon.alt > 0, moonLit: Math.round(phase.fraction * 100) };
