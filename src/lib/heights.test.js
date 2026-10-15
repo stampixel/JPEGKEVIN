@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { orderByHeight, describeHeight, nearestRow } from './heights.js';
+import { orderByHeight, describeHeight, nearestRow, trackGauge } from './heights.js';
 
 const p = (name, altitude) => ({ name, altitude });
 
@@ -30,5 +30,23 @@ describe('nearestRow', () => {
     expect(nearestRow(rows, 110)).toBe('a');
     expect(nearestRow(rows, 312)).toBe('c');
     expect(nearestRow([], 50)).toBeUndefined();
+  });
+});
+
+describe('trackGauge', () => {
+  // The reading line sits 45% down an 800px screen, at 360px.
+  it('stays hidden until the album reaches the reading line', () => {
+    const rows = [{ top: 700, bottom: 900, value: 350 }];
+    expect(trackGauge({ rows, albumTop: 700, albumBottom: 2000, viewportHeight: 800 })).toEqual({ visible: false, height: 350, progress: 0 });
+  });
+
+  it('shows the row on the line and how far through the album it is', () => {
+    const rows = [{ top: 100, bottom: 300, value: 350 }, { top: 320, bottom: 500, value: 200 }];
+    expect(trackGauge({ rows, albumTop: 100, albumBottom: 1100, viewportHeight: 800 })).toEqual({ visible: true, height: 200, progress: 0.26 });
+  });
+
+  it('hides again once the whole album has scrolled past the line', () => {
+    const rows = [{ top: -900, bottom: -700, value: 0 }];
+    expect(trackGauge({ rows, albumTop: -3000, albumBottom: -700, viewportHeight: 800 })).toEqual({ visible: false, height: 0, progress: 1 });
   });
 });

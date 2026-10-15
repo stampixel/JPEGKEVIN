@@ -251,7 +251,8 @@ body { background-image: none; }
 
 /* The album is a building: a CN Tower gauge beside the page on wide screens;
    on narrow screens just the height label, riding the right edge. Never interactive. */
-.gauge-inert { pointer-events: none; user-select: none; }
+.gauge-inert { pointer-events: none; user-select: none; transition: opacity .3s ease; }
+.gauge-hidden { opacity: 0; }
 .gauge { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); height: 74vh; width: 190px; font-family: "Courier New", Courier, monospace; }
 .gauge svg { position: absolute; right: 0; top: 0; height: 100%; width: auto; }
 .gauge-tick { position: absolute; left: 0; width: calc(100% - 46px); border-top: 1px dotted #6a6ab8; font-size: 10px; color: #9a9ae0; line-height: 1; padding-top: 2px; white-space: nowrap; }
@@ -262,14 +263,12 @@ body { background-image: none; }
 .gauge .beacon { animation: beacon 1.4s steps(2, start) infinite; }
 @keyframes beacon { 50% { opacity: 0; } }
 @media (max-width: 1259px) { .gauge { display: none; } }
-.gauge-slim { position: fixed; right: 0; top: 6vh; top: 6svh; height: 88vh; height: 88svh; width: 0; z-index: 5; }
-.gauge-slim .gauge-marker { left: auto; right: 0; width: 0; border-top: 0; }
-.gauge-slim .gauge-label { right: 0; top: -11px; max-width: none; white-space: nowrap; font-size: 11px; padding: 2px 7px; border-right: 0; }
-/* Narrow screens: room below the content so the "street level" label at the
-   bottom of the edge never covers anything. */
-@media (max-width: 1259px) { body.has-gauge { padding-bottom: 130px; } }
+/* The label travels the full height of the screen with the reader's progress through the album. */
+.gauge-slim { position: fixed; right: 0; top: 12px; height: calc(100vh - 46px); height: calc(100svh - 46px); width: 0; z-index: 5; }
+.gauge-slim .gauge-marker { left: auto; right: 0; width: 0; border-top: 0; transition: top .12s linear; }
+.gauge-slim .gauge-label { right: 0; top: 0; max-width: none; white-space: nowrap; font-size: 11px; padding: 2px 7px; border-right: 0; }
 @media (min-width: 1260px) { .gauge-slim { display: none; } }
-@media (prefers-reduced-motion: reduce) { .gauge-marker { transition: none; } .gauge .beacon { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .gauge-marker, .gauge-inert { transition: none; } .gauge .beacon { animation: none; } }
 
 /* Viewer extras and the postcard window */
 .win-status .win-extra { flex: 1; text-align: center; }

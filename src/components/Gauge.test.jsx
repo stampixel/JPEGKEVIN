@@ -25,7 +25,6 @@ describe('Gauge', () => {
     expect(container.querySelector('svg')).toBeNull();
     expect(container.querySelectorAll('.gauge-tick')).toHaveLength(0);
     expect(container.querySelector('.gauge-label').textContent).toBe('about 350 m up, 106th floor');
-    expect(parseFloat(container.querySelector('.gauge-marker').style.top)).toBeCloseTo(100 - (350 / 553) * 100, 1);
   });
 
   it('never captures taps or clicks, in either version', () => {
@@ -33,6 +32,21 @@ describe('Gauge', () => {
       const { container, unmount } = render(<Gauge height={10} slim={slim} />);
       expect(container.firstChild.getAttribute('aria-hidden')).toBe('true');
       expect(container.firstChild.classList.contains('gauge-inert')).toBe(true);
+      unmount();
+    }
+  });
+
+  it('places the phone label by progress through the album, not by height', () => {
+    const { container } = render(<Gauge height={350} slim progress={0.26} />);
+    expect(container.querySelector('.gauge-marker').style.top).toBe('26%');
+    expect(container.querySelector('.gauge-label').textContent).toBe('about 350 m up, 106th floor');
+  });
+
+  it('can be hidden, in either version, and fades rather than unmounting', () => {
+    for (const slim of [false, true]) {
+      const { container, unmount } = render(<Gauge height={10} slim={slim} hidden />);
+      expect(container.firstChild.classList.contains('gauge-hidden')).toBe(true);
+      expect(container.querySelector('.gauge-label')).toBeTruthy();
       unmount();
     }
   });
