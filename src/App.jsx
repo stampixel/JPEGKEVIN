@@ -23,7 +23,7 @@ function indexFromHash() {
 }
 
 const NARROW = '(max-width: 520px)';        // album: one landscape or two portraits per row
-const SLIM_GAUGE = '(max-width: 1259px)';  // below this the full tower and its scale would touch the page
+const SLIM_GAUGE = '(max-width: 1299px)';  // below this there is no room beside the page for the building
 function useMediaQuery(query) {
   const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
   useEffect(() => {
