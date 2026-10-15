@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Album from './components/Album.jsx';
 import Desk from './components/Desk.jsx';
 import Gauge from './components/Gauge.jsx';
+import Links from './components/Links.jsx';
 import PhotoViewer from './components/PhotoViewer.jsx';
 import PostcardDialog from './components/PostcardDialog.jsx';
 import Sky from './components/Sky.jsx';
@@ -104,6 +105,7 @@ function App() {
               able to provide for my family. I am also proud of myself as a person. I hope I can make an impact
               on this world.
             </p>
+            <Links />
           </div>
         </section>
 
