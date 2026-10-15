@@ -21,7 +21,7 @@ describe('PhotoViewer', () => {
 
   it('links to the full-size file, labelled with its pixel size', () => {
     render(<PhotoViewer photos={photos} index={1} onChange={noop} onClose={noop} />);
-    const link = screen.getByRole('link', { name: 'full size (1365 x 2048)' });
+    const link = screen.getByRole('link', { name: 'Full size (1365 x 2048)' });
     expect(link.getAttribute('href')).toBe('/b.jpg');
     expect(link.getAttribute('target')).toBe('_blank');
   });
@@ -29,9 +29,9 @@ describe('PhotoViewer', () => {
   it('steps to the next and previous photo, wrapping at the ends', () => {
     const onChange = vi.fn();
     render(<PhotoViewer photos={photos} index={2} onChange={onChange} onClose={noop} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Next >>' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     expect(onChange).toHaveBeenLastCalledWith(0);
-    fireEvent.click(screen.getByRole('button', { name: '<< Prev' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Prev' }));
     expect(onChange).toHaveBeenLastCalledWith(1);
   });
 
@@ -74,7 +74,7 @@ describe('PhotoViewer', () => {
   it('offers to send the photo as a postcard when asked to', () => {
     const onPostcard = vi.fn();
     render(<PhotoViewer photos={photos} index={2} onChange={noop} onClose={noop} onPostcard={onPostcard} />);
-    fireEvent.click(screen.getByRole('button', { name: 'send as postcard' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Send as postcard' }));
     expect(onPostcard).toHaveBeenCalledWith(photos[2]);
   });
 });

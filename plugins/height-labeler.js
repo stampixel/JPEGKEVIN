@@ -68,27 +68,30 @@ const PAGE = `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Label heights</title>
 <style>
-  body { margin: 0; padding: 18px 8px 40px; background: #000030; font-family: "Times New Roman", Times, serif; color: #000; }
-  .page { max-width: 800px; margin: 0 auto; background: #C0C0C0; border: 3px outset #fff; padding: 10px; }
-  .masthead { background: #000080; color: #FFFF00; border: 2px inset #fff; text-align: center; padding: 8px; font: bold 22px "Comic Sans MS", cursive; }
-  .help { background: #FFFFCC; border: 2px inset #808080; padding: 8px 12px; margin: 10px 0; font-size: 14px; line-height: 1.45; }
-  .summary { font: 13px "Courier New", Courier, monospace; margin: 8px 2px; }
-  .row { display: flex; gap: 12px; align-items: center; background: #E8E8E8; border: 2px outset #C0C0C0; padding: 8px; margin-top: 8px; }
-  .row img { width: 220px; height: auto; border: 2px solid #000080; display: block; flex: none; }
-  .row .name { font: 11px "Courier New", monospace; color: #444; word-break: break-all; }
-  .row input { width: 84px; font: 16px "Times New Roman", serif; padding: 3px 6px; border: 2px inset #808080; background: #fff; }
-  .row .floor { font: 12px "Courier New", monospace; color: #006600; min-height: 14px; margin-top: 4px; }
-  .row .state { font: 11px "Comic Sans MS", cursive; color: #CC0000; margin-top: 2px; }
+  body { margin: 0; padding: 24px 12px 40px; background: #000030; font: 15px/1.5 Geneva, Verdana, "Lucida Grande", "DejaVu Sans", sans-serif; color: #000; }
+  .page { max-width: 800px; margin: 0 auto; background: #fff; border: 1px solid #000; box-shadow: 2px 2px 0 #000; }
+  .masthead { position: relative; height: 26px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #000; font: 700 18px/1 "Pixelify Sans", sans-serif; }
+  .masthead::before { content: ""; position: absolute; left: 3px; right: 3px; top: 5px; bottom: 5px; background: repeating-linear-gradient(180deg, #000 0 1px, transparent 1px 3px); }
+  .masthead span { position: relative; background: #fff; padding: 0 10px; }
+  .help { margin: 14px; padding: 10px 12px; border: 1px solid #000; font-size: 14px; }
+  .summary { margin: 0 14px 6px; font-size: 13px; }
+  .row { display: flex; gap: 12px; align-items: center; margin: 8px 14px; padding: 8px; border: 1px solid #000; }
+  .row img { width: 220px; height: auto; border: 1px solid #000; display: block; flex: none; }
+  .row .name { font-size: 11px; color: #444; word-break: break-all; }
+  .row input { width: 84px; font: 15px Geneva, Verdana, sans-serif; padding: 3px 6px; border: 1px solid #000; background: #fff; }
+  .row .floor { font-size: 12px; color: #006600; min-height: 14px; margin-top: 4px; }
+  .row .state { font-size: 11px; color: #CC0000; margin-top: 2px; }
   .row.done .state { color: #006600; }
-  .btn95 { font: 12px "MS Sans Serif", Tahoma, Geneva, sans-serif; background: #C0C0C0; border: 2px outset #fff; padding: 3px 9px; cursor: pointer; }
-  .btn95:active { border-style: inset; }
-  a { color: #0000EE; }
+  .btn95 { font: 12px Geneva, Verdana, sans-serif; background: #fff; border: 1px solid #000; border-radius: 6px; padding: 2px 10px; cursor: pointer; }
+  .btn95:active { background: #000; color: #fff; }
+  a { color: #000; }
+  @font-face { font-family: "Pixelify Sans"; font-weight: 400 700; src: url("/fonts/pixelify-sans.woff2") format("woff2"); }
   @media (max-width: 560px) { .row { flex-direction: column; align-items: flex-start; } .row img { width: 100%; } }
 </style>
 </head>
 <body>
 <div class="page">
-  <div class="masthead">&#9733; Label heights</div>
+  <div class="masthead"><span>Label heights</span></div>
   <div class="help">For each photo, type how high above the street you were, in metres. Leave it blank if you don't know. It saves by itself into <b>src/heights.js</b>, and the site at <a href="/" target="_blank">localhost:5173</a> reloads with the new order and gauge. Entries marked as a guess were estimated by Claude; typing a number (even the same one) confirms it.</div>
   <div class="summary" id="summary"></div>
   <div id="list"></div>

@@ -57,26 +57,23 @@ export default function PhotoViewer({ photos, index, onChange, onClose, onPostca
       onTouchEnd={onTouchEnd}
     >
       <div className="win">
-        <div className="win-title win-chrome">
+        <div className="win-title">
+          <button ref={closeRef} className="win-x" type="button" aria-label="Close" onClick={onClose} />
           <span>{title}</span>
-          <button ref={closeRef} className="win-x" type="button" aria-label="Close" onClick={onClose}>
-            &#10005;
-          </button>
         </div>
         <div className="win-body">
           <img key={photo.src} src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} />
         </div>
-        <div className="win-status win-chrome">
-          <span>
-            [ <button className="linkish" type="button" onClick={() => step(-1)}>&lt;&lt; Prev</button>
-            {' | '}
-            <button className="linkish" type="button" onClick={() => step(1)}>Next &gt;&gt;</button> ]
+        <div className="win-status">
+          <span className="btn-row">
+            <button className="btn" type="button" onClick={() => step(-1)}>Prev</button>
+            <button className="btn" type="button" onClick={() => step(1)}>Next</button>
           </span>
           <span className="win-extra">
-            {onPostcard && <button className="linkish" type="button" onClick={() => onPostcard(photo)}>send as postcard</button>}
+            {onPostcard && <button className="btn" type="button" onClick={() => onPostcard(photo)}>Send as postcard</button>}
           </span>
           <a href={photo.src} target="_blank" rel="noopener noreferrer">
-            full size <span className="win-dims">({photo.width} x {photo.height})</span>
+            Full size <span className="win-dims">({photo.width} x {photo.height})</span>
           </a>
         </div>
       </div>
