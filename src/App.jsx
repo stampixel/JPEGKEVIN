@@ -91,19 +91,23 @@ function App() {
           <h1 className="titlebar" id="site-title"><span>Kevin Tang</span></h1>
           <div className="about">
             <p>
-              I think some questions are too big to answer. I don’t have any deeper reason on why I risk my
-              life to take photos. I just kinda do it. Throughout life I’ve also noticed people who are good at one
-              thing often have other things they are equally as good at, even if it is in a completely
-              unadjacent field. I hope the photos I take while freeclimbing/urbexing are that ‘unadjacent’
-              field.
+              I’ve noticed that people who are good at one thing often have other things they are equally as
+              good at, even if it is in a completely unadjacent field. I hope the photos I take while
+              freeclimbing/urbexing/rooftopping are that ‘unadjacent’ field. I don’t think there is a deeper
+              reason why I risk my life to take these photos other than the fact that it gives me some form of
+              fulfillment and allows me to self-express. I don’t think about it too much, though; some
+              questions are too big to answer.
             </p>
             <p>
-              I don’t do anything I don’t enjoy, and some of the things I do enjoy are: programming,
-              photography, cycling, and writing. I occasionally smoke too, it’s fun. I don’t have a lot of
-              achievements, however some of the things I’m proud of are: 5-figure dropshipping business in
-              high school, solo traveling to climb buildings, knowing how to lockpick really well, and being
-              able to provide for my family. I am also proud of myself as a person. I hope I can make an impact
-              on this world.
+              Outside of that, I don’t do anything I don’t enjoy doing, and some of the other things I do enjoy
+              are programming, photography, cycling, and writing. I occasionally smoke too. I wouldn’t say I
+              have a lot of achievements; however, some of the things I’m proud of are a 5-figure dropshipping
+              business in high school, solo traveling to cities to climb buildings, knowing how to lockpick
+              really well, and being able to provide for my family at 19. I am also proud of who I am as a
+              person.
+            </p>
+            <p>
+              I hope I can make an impact on this world. Feel free to reach out to me, always happy to chat!
             </p>
             <Links />
           </div>
