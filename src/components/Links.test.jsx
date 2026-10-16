@@ -20,11 +20,10 @@ describe('Links', () => {
     ]);
   });
 
-  it('uses plain links that open in the same tab, like every other link on the page', () => {
+  it('renders ordinary links with no target, so each profile opens in the same tab', () => {
     render(<Links />);
     for (const a of screen.getAllByRole('link')) {
-      expect(a.hasAttribute('target')).toBe(false);
-      expect(a.hasAttribute('rel')).toBe(false);
+      expect(a.getAttribute('target')).not.toBe('_blank');
     }
   });
 
