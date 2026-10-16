@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .gstack/
+
+# local mockups and rendered share-card candidates; never shipped
+/design/
