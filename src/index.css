@@ -65,6 +65,7 @@ a:focus-visible, button:focus-visible { outline: 2px dotted var(--ink); outline-
 .about { padding: 16px 18px; }
 .about p { margin: 0 0 12px; }
 .about p:last-child { margin-bottom: 0; }
+@media (max-width: 520px) { .about { font-size: 14px; } }  /* a step smaller on phones only, Kevin's call */
 
 /* Fresh prints: loose prints on the classic 50% dither */
 .desk {
