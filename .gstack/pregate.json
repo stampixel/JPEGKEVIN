@@ -6,7 +6,8 @@
     "design/**": [],
     ".gitignore": [],
     ".gstack/**": [],
-    "*.md": []
+    "*.md": [],
+    "src/**/*.css": []
   },
   "selection": {},
   "warn": [],
